@@ -111,6 +111,7 @@ async def chat(
 
     transport = registry.resolve(normalised.provider, normalised.model, "chat")
     upstream_start = time.monotonic()
+    print(f"[chat] request body: {normalised.model_dump_json(indent=2)}")
     try:
         response = await transport.chat(normalised, tenant_key)
     except UpstreamTransportError as upstream_error:
@@ -131,6 +132,7 @@ async def chat(
         redactions_applied=input_result.redactions,
     )
     response.cost = _compute_cost(normalised.provider, normalised.model, response.usage)
+    print(f"[chat] response: {response}")
     # TODO: Step 10 — ledger write
     await cache.set(cache_key, response, ttl_seconds=settings.cache_ttl_seconds)
     return response
